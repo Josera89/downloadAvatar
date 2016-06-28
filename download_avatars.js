@@ -1,26 +1,23 @@
+var abcde = 123;
 var repoOwner = process.argv[2];
-var repoName = process.argv[3];
+var repoName  = process.argv[3];
 
 var fs = require('fs');
 var request = require('request');
+
 var username = "josera89";
 var password = "e8c58f44d5cf8c9da17b5ea81134dc0d098b24bb";
 
-// process.argv.forEach((val, index) => {
-//   console.log(`${index}: ${val}`);
-// });
-
-function getRepoContributors(repoOwner, repoName, cb) {
-  request({ // request(options, callback);
+function getRepoContributors(repoOwner, repoName, callback) {
+  request({
     url: "https://" + username + ":" + password + "@api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
-    // url: 'https://username:api.github.com/repos/lighthouse-labs/laser_shark/contributors',
-
     headers: {
+      // github requirement
       'User-Agent': 'request'
     }},
 
     function(err, request, body) {
-      cb(err, JSON.parse(body));
+      callback(err, JSON.parse(body));
     });
 }
 
@@ -29,13 +26,8 @@ function downloadImageByURL(url, fileName) {
   request(url).pipe(file);
 };
 
-
-getRepoContributors( repoOwner, repoName, function (err, result) {
-  result.forEach( function(contributor) {
-    //url repoOwner.avatar_url, './.avartars/${repoOwner.login}.jpg'
+getRepoContributors(repoOwner, repoName, function (err, contributorsList) {
+  contributorsList.forEach(function(contributor) {
     downloadImageByURL(contributor.avatar_url, "./avatars/" + contributor.login + ".jpg")
   })
 });
-
-
-
